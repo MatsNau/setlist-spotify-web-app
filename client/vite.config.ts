@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'https://setlist-spotify-web-app.onrender.com:3001',
         changeOrigin: true,
       }
     }
