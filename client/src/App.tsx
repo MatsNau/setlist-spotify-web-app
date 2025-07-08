@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Music, Link, LogIn, Search, Plus, Check, AlertCircle, Loader2, Edit2, Save, LogOut } from 'lucide-react';
 import axios from 'axios';
 
