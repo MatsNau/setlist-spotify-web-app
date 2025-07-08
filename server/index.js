@@ -16,8 +16,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const HOST = '0.0.0.0'; // Wichtig für Render!
 
-
-
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
@@ -26,17 +24,7 @@ app.use(cors({
   credentials: true
 }));
 
-
 app.use(express.json());
-
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'public')));
-  
-  // Catch all route - serve React app
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  });
-}
 
 // Debug middleware
 app.use((req, res, next) => {
@@ -56,6 +44,10 @@ const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI || 'http://localho
 const generateRandomString = (length) => {
   return crypto.randomBytes(length).toString('hex');
 };
+
+// ============================================
+// API ROUTES - MÜSSEN VOR STATIC FILES KOMMEN!
+// ============================================
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -367,6 +359,19 @@ app.post('/api/setlist/from-url', async (req, res) => {
   }
 });
 
+// ============================================
+// STATIC FILES - MUSS NACH ALLEN API ROUTES KOMMEN!
+// ============================================
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
+  
+  // Catch all route - serve React app - MUSS DIE ALLERLETZTE ROUTE SEIN!
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
+
+// Server starten
 app.listen(PORT, HOST, () => {
   console.log(`Server running on http://${HOST}:${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
