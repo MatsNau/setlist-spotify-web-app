@@ -302,41 +302,41 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-12">
-          <div className="flex justify-center items-center gap-3 mb-4">
-            <Music className="w-10 h-10 text-green-400" />
-            <h1 className="text-4xl font-bold text-white">Setlist to Spotify</h1>
+      <div className="container mx-auto px-4 py-4 md:py-8 max-w-7xl">
+        <header className="text-center mb-8 md:mb-12">
+          <div className="flex justify-center items-center gap-2 md:gap-3 mb-3 md:mb-4">
+            <Music className="w-8 h-8 md:w-10 md:h-10 text-green-400" />
+            <h1 className="text-2xl md:text-4xl font-bold text-white">Setlist to Spotify</h1>
           </div>
-          <p className="text-gray-300">Transform concert setlists into Spotify playlists</p>
+          <p className="text-gray-300 text-sm md:text-base px-4">Transform concert setlists into Spotify playlists</p>
           
           {/* Server Status Indicator */}
-          <div className="mt-4 flex justify-center items-center gap-2">
+          <div className="mt-3 md:mt-4 flex justify-center items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${
               serverStatus === 'online' ? 'bg-green-400' : 
               serverStatus === 'offline' ? 'bg-red-400' : 
               'bg-yellow-400'
             }`} />
-            <span className="text-sm text-gray-400">
+            <span className="text-xs md:text-sm text-gray-400">
               Server: {serverStatus}
             </span>
           </div>
         </header>
 
         {!tokens ? (
-          <div className="max-w-md mx-auto">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center">
-              <LogIn className="w-16 h-16 text-green-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-semibold text-white mb-4">Get Started</h2>
-              <p className="text-gray-300 mb-6">
+          <div className="max-w-md mx-auto px-4">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 text-center">
+              <LogIn className="w-12 h-12 md:w-16 md:h-16 text-green-400 mx-auto mb-4" />
+              <h2 className="text-xl md:text-2xl font-semibold text-white mb-3 md:mb-4">Get Started</h2>
+              <p className="text-gray-300 text-sm md:text-base mb-6">
                 Connect your Spotify account to create playlists from concert setlists
               </p>
               <button
                 onClick={handleSpotifyLogin}
                 disabled={serverStatus === 'offline'}
-                className="bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-medium px-8 py-3 rounded-full transition-colors duration-200 flex items-center gap-2 mx-auto"
+                className="bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-medium px-6 md:px-8 py-2.5 md:py-3 rounded-full transition-colors duration-200 flex items-center gap-2 mx-auto text-sm md:text-base"
               >
-                <LogIn className="w-5 h-5" />
+                <LogIn className="w-4 h-4 md:w-5 md:h-5" />
                 Login with Spotify
               </button>
             </div>
@@ -344,10 +344,10 @@ export default function App() {
         ) : (
           <div className="max-w-4xl mx-auto">
             {/* Logout button */}
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-end mb-4 px-4 md:px-0">
               <button
                 onClick={handleLogout}
-                className="text-gray-400 hover:text-white transition-colors duration-200 flex items-center gap-2"
+                className="text-gray-400 hover:text-white transition-colors duration-200 flex items-center gap-2 text-sm"
               >
                 <LogOut className="w-4 h-4" />
                 Logout
@@ -355,56 +355,56 @@ export default function App() {
             </div>
 
             {/* URL Input Section */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 mb-6">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Link className="w-5 h-5" />
+            <div className="bg-white/10 backdrop-blur-md rounded-xl md:rounded-2xl p-4 md:p-6 mb-4 md:mb-6 mx-4 md:mx-0">
+              <h2 className="text-lg md:text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <Link className="w-4 h-4 md:w-5 md:h-5" />
                 Paste Setlist.fm Link
               </h2>
-              <div className="flex gap-2">
+              <div className="flex flex-col md:flex-row gap-2">
                 <input
                   type="text"
                   placeholder="https://www.setlist.fm/setlist/..."
                   value={setlistUrl}
                   onChange={(e) => setSetlistUrl(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && loadSetlist()}
-                  className="flex-1 bg-white/20 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-400"
+                  className="flex-1 bg-white/20 text-white placeholder-gray-400 rounded-lg px-4 py-2.5 md:py-3 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm md:text-base"
                 />
                 <button
                   onClick={loadSetlist}
                   disabled={loading || !setlistUrl.trim() || serverStatus === 'offline'}
-                  className="bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-medium px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                  className="bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-medium px-4 md:px-6 py-2.5 md:py-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm md:text-base"
                 >
                   {loading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
                   ) : (
-                    <Search className="w-5 h-5" />
+                    <Search className="w-4 h-4 md:w-5 md:h-5" />
                   )}
-                  Load Setlist
+                  <span className="md:inline">Load Setlist</span>
                 </button>
               </div>
-              <p className="text-gray-400 text-sm mt-2">
+              <p className="text-gray-400 text-xs md:text-sm mt-2 break-all">
                 Example: https://www.setlist.fm/setlist/turnstile/2025/agrobaan-ysselsteyn-netherlands-335fb495.html
               </p>
             </div>
 
             {error && (
-              <div className="bg-red-500/20 backdrop-blur-md rounded-lg p-4 mb-6 flex items-center gap-2 text-white">
-                <AlertCircle className="w-5 h-5" />
-                {error}
+              <div className="bg-red-500/20 backdrop-blur-md rounded-lg p-3 md:p-4 mb-4 md:mb-6 mx-4 md:mx-0 flex items-start gap-2 text-white">
+                <AlertCircle className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0 mt-0.5" />
+                <span className="text-sm md:text-base">{error}</span>
               </div>
             )}
 
             {/* Setlist Details & Tracks */}
             {setlist && spotifyTracks.length > 0 && (
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6">
-                <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl md:rounded-2xl p-4 md:p-6 mx-4 md:mx-0">
+                <div className="mb-4 md:mb-6">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-1 md:mb-2">
                     {setlist.artist.name}
                   </h3>
-                  <p className="text-gray-300">
+                  <p className="text-gray-300 text-sm md:text-base">
                     {setlist.venue.name}, {setlist.venue.city.name}
                   </p>
-                  <p className="text-gray-400">
+                  <p className="text-gray-400 text-sm">
                     {new Date(setlist.date).toLocaleDateString('en-US', {
                       weekday: 'long',
                       year: 'numeric',
@@ -415,15 +415,15 @@ export default function App() {
                 </div>
                 
                 {/* Editable Playlist Name */}
-                <div className="mb-6">
-                  <label className="text-sm text-gray-400 mb-2 block">Playlist Name</label>
+                <div className="mb-4 md:mb-6">
+                  <label className="text-xs md:text-sm text-gray-400 mb-2 block">Playlist Name</label>
                   {isEditingName ? (
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
                         value={playlistName}
                         onChange={(e) => setPlaylistName(e.target.value)}
-                        className="flex-1 bg-white/20 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="flex-1 bg-white/20 text-white rounded-lg px-3 md:px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm md:text-base"
                       />
                       <button
                         onClick={() => setIsEditingName(false)}
@@ -434,10 +434,10 @@ export default function App() {
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <p className="text-white font-medium">{playlistName}</p>
+                      <p className="text-white font-medium text-sm md:text-base truncate flex-1">{playlistName}</p>
                       <button
                         onClick={() => setIsEditingName(true)}
-                        className="text-gray-400 hover:text-white transition-colors"
+                        className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -445,25 +445,25 @@ export default function App() {
                   )}
                 </div>
                 
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-white mb-3">
+                <div className="mb-4 md:mb-6">
+                  <h4 className="text-base md:text-lg font-semibold text-white mb-3">
                     Found {spotifyTracks.length} of {getSongsFromSetlist(setlist).length} songs
                   </h4>
                   
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                  <div className="space-y-1.5 md:space-y-2 max-h-60 md:max-h-96 overflow-y-auto">
                     {spotifyTracks.map((track, index) => (
-                      <div key={track.id} className="bg-white/5 rounded-lg p-3 flex items-center gap-3">
-                        <span className="text-gray-400 text-sm w-6">{index + 1}</span>
+                      <div key={track.id} className="bg-white/5 rounded-lg p-2 md:p-3 flex items-center gap-2 md:gap-3">
+                        <span className="text-gray-400 text-xs md:text-sm w-5 md:w-6 flex-shrink-0">{index + 1}</span>
                         {track.album.images[0] && (
                           <img 
                             src={track.album.images[0].url} 
                             alt={track.album.images[0].url}
-                            className="w-10 h-10 rounded"
+                            className="w-8 h-8 md:w-10 md:h-10 rounded flex-shrink-0"
                           />
                         )}
-                        <div className="flex-1">
-                          <p className="text-white font-medium">{track.name}</p>
-                          <p className="text-gray-400 text-sm">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium text-sm md:text-base truncate">{track.name}</p>
+                          <p className="text-gray-400 text-xs md:text-sm truncate">
                             {track.artists.map(a => a.name).join(', ')}
                           </p>
                         </div>
@@ -472,13 +472,13 @@ export default function App() {
                   </div>
                   
                   {notFoundTracks.length > 0 && (
-                    <details className="mt-4">
-                      <summary className="text-yellow-400 cursor-pointer hover:text-yellow-300">
+                    <details className="mt-3 md:mt-4">
+                      <summary className="text-yellow-400 cursor-pointer hover:text-yellow-300 text-sm md:text-base">
                         {notFoundTracks.length} songs not found on Spotify
                       </summary>
                       <div className="mt-2 space-y-1">
                         {notFoundTracks.map((track, index) => (
-                          <p key={index} className="text-gray-400 text-sm">• {track}</p>
+                          <p key={index} className="text-gray-400 text-xs md:text-sm">• {track}</p>
                         ))}
                       </div>
                     </details>
@@ -489,26 +489,26 @@ export default function App() {
                   <button
                     onClick={createPlaylist}
                     disabled={loading || !playlistName.trim()}
-                    className="bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-medium px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2 mx-auto"
+                    className="bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-medium px-6 py-2.5 md:py-3 rounded-lg transition-colors duration-200 flex items-center gap-2 mx-auto text-sm md:text-base"
                   >
                     {loading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
                     ) : (
-                      <Plus className="w-5 h-5" />
+                      <Plus className="w-4 h-4 md:w-5 md:h-5" />
                     )}
                     Create Playlist
                   </button>
                 ) : (
                   <div className="text-center">
-                    <div className="bg-green-500/20 rounded-lg p-4 mb-4">
-                      <Check className="w-8 h-8 text-green-400 mx-auto mb-2" />
-                      <p className="text-white font-semibold">Playlist Created Successfully!</p>
+                    <div className="bg-green-500/20 rounded-lg p-3 md:p-4 mb-3 md:mb-4">
+                      <Check className="w-6 h-6 md:w-8 md:h-8 text-green-400 mx-auto mb-2" />
+                      <p className="text-white font-semibold text-sm md:text-base">Playlist Created Successfully!</p>
                     </div>
                     <a
                       href={playlistUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-lg transition-colors duration-200 inline-flex items-center gap-2"
+                      className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-2.5 md:py-3 rounded-lg transition-colors duration-200 inline-flex items-center gap-2 text-sm md:text-base"
                     >
                       Open in Spotify
                     </a>
@@ -519,8 +519,8 @@ export default function App() {
 
             {loading && !setlist && (
               <div className="text-center py-8">
-                <Loader2 className="w-8 h-8 text-white animate-spin mx-auto mb-2" />
-                <p className="text-gray-300">Loading setlist...</p>
+                <Loader2 className="w-6 h-6 md:w-8 md:h-8 text-white animate-spin mx-auto mb-2" />
+                <p className="text-gray-300 text-sm md:text-base">Loading setlist...</p>
               </div>
             )}
           </div>
