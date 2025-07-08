@@ -7,9 +7,9 @@
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
-    "build": "cd client && npm run build",
-    "start": "cd server && npm start",
-    "build-and-move": "npm run build && cp -r client/dist server/public"
+    "build": "npm run build-and-move",
+    "build-and-move": "cd client && npm install && npm run build && cp -r dist ../server/public",
+    "start": "node server/index.js"
   },
   "dependencies": {
     "axios": "^1.6.2",
