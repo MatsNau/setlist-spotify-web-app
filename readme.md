@@ -332,12 +332,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 7. **Offline Support**: PWA capabilities
 8. **Multi-language**: i18n support
 
-## 📞 Support
-
-For issues and questions:
-- GitHub Issues: [Create an issue](https://github.com/yourusername/setlist-spotify/issues)
-- Email: support@example.com
-
 ---
 
 Built with ❤️ by developers who love live music
