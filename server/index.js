@@ -6,6 +6,7 @@ import { dirname } from 'path';
 import { config, validateConfig } from './src/config/environment.js';
 import { requestLogger } from './src/middleware/logging.js';
 import apiRoutes from './src/routes/index.js';
+import keepAliveService from './src/services/keepAliveService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,4 +45,20 @@ app.listen(config.port, config.host, () => {
   console.log(`Environment: ${config.nodeEnv}`);
   
   validateConfig();
+  
+  // Start KeepAlive service to prevent Render from sleeping
+  keepAliveService.start();
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM, shutting down gracefully...');
+  keepAliveService.stop();
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT, shutting down gracefully...');
+  keepAliveService.stop();
+  process.exit(0);
 });
