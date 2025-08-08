@@ -9,7 +9,8 @@ Transform concert setlists from setlist.fm into Spotify playlists with a single 
 
 ## 🎵 Overview
 
-This full-stack application bridges the gap between live concert experiences and digital music consumption. Users can paste a setlist.fm URL, and the app automatically creates a Spotify playlist with all the songs from that concert.
+This full-stack application bridges the gap between live concert experiences and digital music consumption. Users can paste a setlist.fm URL, and the app automatically creates a Spotify playlist with all the songs from that concert. Currently hosted on: https://setlist-spotify-web-app.onrender.com/
+**NOTE: You won't be able to use the hosted app since I only use the spotify API for developers. Thus your account needs a manual registration for the application.**
 
 ### Key Features
 
@@ -19,18 +20,24 @@ This full-stack application bridges the gap between live concert experiences and
 - ✏️ Customizable playlist names
 - 📱 Fully responsive design for all devices
 - 🚀 One-click deployment ready
+- 🔄 Keep-alive service prevents Render.com from sleeping
+- 🏗️ Clean modular architecture with separated concerns
 
 ## 🏗️ Architecture & Technical Decisions
 
 ### Overall Architecture
 
-The application follows a **client-server architecture** with clear separation of concerns:
+The application follows a **modular client-server architecture** with clean separation of concerns:
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌──────────────┐
 │   Client    │────▶│   Server    │────▶│  External    │
 │   (React)   │◀────│  (Express)  │◀────│    APIs      │
-└─────────────┘     └─────────────┘     └──────────────┘
+│             │     │             │     │ • Spotify    │
+│ Components  │     │ Services    │     │ • Setlist.fm │
+│ Hooks       │     │ Controllers │     │ • KeepAlive  │
+│ Services    │     │ Routes      │     └──────────────┘
+└─────────────┘     └─────────────┘
                           │
                           ▼
                     ┌─────────────┐
@@ -127,12 +134,23 @@ POST /api/setlist/from-url       # Parse setlist from URL
 
 #### Component Structure
 ```
-components/
-├── Layout/          # App structure
-├── Auth/            # Authentication flows  
-├── Setlist/         # Setlist display
-├── Playlist/        # Playlist creation
-└── Common/          # Shared components
+client/src/
+├── components/
+│   ├── Layout/          # Header, LoginCard
+│   ├── common/          # ErrorMessage, LoadingSpinner, ServerStatus
+│   ├── setlist/         # SetlistInput, SetlistDetails
+│   ├── playlist/        # PlaylistNameEditor, PlaylistActions
+│   └── tracks/          # TrackList
+├── hooks/               # Custom React hooks
+│   ├── useSpotifyAuth   # Authentication management
+│   ├── useServerStatus  # Health monitoring
+│   └── useSetlist       # Setlist operations
+├── services/            # API communication
+├── types/               # TypeScript definitions
+├── utils/               # Helper functions
+│   ├── auth.ts          # Token management
+│   └── setlist.ts       # Setlist processing
+└── App.tsx              # Main application component
 ```
 
 #### State Management
@@ -143,9 +161,9 @@ components/
   - Sufficient: App has minimal global state
 
 #### Custom Hooks
-- `useAuth`: Authentication logic and token management
-- `useServerStatus`: Health check monitoring
-- `useSetlist`: Setlist loading and processing
+- `useSpotifyAuth`: Complete Spotify authentication flow and token management
+- `useServerStatus`: Server health monitoring with automatic retry
+- `useSetlist`: Setlist loading, track searching, and playlist creation
 
 ### Security Considerations
 
@@ -177,17 +195,14 @@ components/
    - Spotify tracks added in batches of 100
    - Parallel track searches where possible
 
-3. **Caching Strategy** (Future Enhancement)
-   - Cache setlist data
-   - Cache track search results
-
 ### Deployment Strategy
 
 #### Render.com Configuration
 - **Build Command**: Compiles both client and server
-- **Start Command**: Runs Express server
+- **Start Command**: Runs Express server with keep-alive service
 - **Static Files**: Served from Express in production
 - **Environment**: Variables set in Render dashboard
+- **Keep-Alive**: Prevents free tier from sleeping
 
 #### CI/CD Pipeline
 - **Automatic Deployments**: On push to main branch
@@ -213,7 +228,12 @@ cd setlist-spotify-fullstack
 
 2. Install dependencies:
 ```bash
+# Install all dependencies (client + server)
 npm run install-all
+
+# Or install individually:
+cd server && npm install
+cd ../client && npm install
 ```
 
 3. Configure environment variables:
@@ -234,21 +254,58 @@ VITE_API_URL=http://localhost:3001/api
 ```
 
 4. Start development servers:
+
+**Option 1: Both services (recommended)**
 ```bash
 npm run dev
 ```
 
-### Production Deployment
-
-1. Build the application:
+**Option 2: Separate terminals**
 ```bash
-npm run build
+# Terminal 1 - Server
+cd server
+npm start
+
+# Terminal 2 - Client  
+cd client
+npm run dev
 ```
 
-2. Deploy to Render.com:
+**Access the application:**
+- Client: http://localhost:5173
+- Server API: http://localhost:3001/api
+
+### Production Deployment on Render.com
+
+1. **Build Configuration:**
+   ```bash
+   npm run build
+   ```
+
+2. **Environment Variables:**
+   ```env
+   # Required
+   SETLIST_API_KEY=your-setlist-api-key
+   SPOTIFY_CLIENT_ID=your-spotify-client-id
+   SPOTIFY_CLIENT_SECRET=your-spotify-client-secret
+   
+   # Render-specific
+   RENDER_EXTERNAL_URL=https://your-app.onrender.com
+   CLIENT_URL=https://your-app.onrender.com
+   SPOTIFY_REDIRECT_URI=https://your-app.onrender.com/callback
+   ```
+
+3. **Render Setup:**
    - Connect GitHub repository
-   - Set environment variables
+   - Set build command: `npm run build`
+   - Set start command: `cd server && npm start`
+   - Add environment variables
    - Deploy
+
+4. **Keep-Alive Service:**
+   - Automatically prevents Render free tier from sleeping
+   - Pings server every 14 minutes
+   - Logs activity for monitoring
 
 ## 📁 Project Structure
 
@@ -256,37 +313,55 @@ npm run build
 .
 ├── server/
 │   ├── src/
-│   │   ├── config/        # Configuration management
-│   │   ├── middleware/    # Express middleware
-│   │   ├── routes/        # API endpoints
-│   │   ├── services/      # Business logic
-│   │   └── app.js         # Express app setup
-│   └── index.js           # Server entry point
+│   │   ├── config/
+│   │   │   └── environment.js     # Environment configuration
+│   │   ├── controllers/
+│   │   │   ├── healthController.js      # Health check endpoint
+│   │   │   ├── spotifyController.js     # Spotify API handlers
+│   │   │   └── setlistController.js     # Setlist API handlers
+│   │   ├── middleware/
+│   │   │   └── logging.js         # Request logging middleware
+│   │   ├── routes/
+│   │   │   └── index.js           # Route definitions
+│   │   ├── services/
+│   │   │   ├── spotifyService.js  # Spotify API business logic
+│   │   │   ├── setlistService.js  # Setlist.fm API business logic
+│   │   │   └── keepAliveService.js # Render keep-alive service
+│   │   └── utils/
+│   │       └── crypto.js          # Utility functions
+│   ├── package.json
+│   └── index.js                   # Server entry point
 ├── client/
 │   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── hooks/         # Custom React hooks
-│   │   ├── services/      # API communication
-│   │   ├── types/         # TypeScript types
-│   │   └── App.tsx        # Main component
-│   └── index.html         # Entry HTML
+│   │   ├── components/            # Modular React components
+│   │   │   ├── Layout/           # App structure components
+│   │   │   ├── common/           # Shared UI components
+│   │   │   ├── setlist/          # Setlist-specific components
+│   │   │   ├── playlist/         # Playlist management
+│   │   │   └── tracks/           # Track display components
+│   │   ├── hooks/                # Custom React hooks
+│   │   ├── services/
+│   │   │   └── api.ts            # API client
+│   │   ├── types/
+│   │   │   └── index.ts          # TypeScript type definitions
+│   │   ├── utils/                # Client-side utilities
+│   │   └── App.tsx               # Main application component
+│   ├── package.json
+│   └── index.html
+├── keep-alive-instructions.md     # Render deployment guide
 └── README.md
 ```
 
 ## 🔧 Development
 
-### Code Style
+### Code Style & Architecture
 
 - **ESLint**: Enforced code standards
 - **Prettier**: Consistent formatting
 - **TypeScript**: Type safety on frontend
+- **Modular Design**: Separated concerns with services, hooks, and components
+- **Clean Architecture**: Business logic separated from UI
 - **Conventional Commits**: Semantic versioning
-
-### Testing Strategy (Future Enhancement)
-
-- **Unit Tests**: Jest for business logic
-- **Integration Tests**: Supertest for API
-- **E2E Tests**: Cypress for user flows
 
 ### Development Workflow
 
@@ -303,14 +378,6 @@ npm run build
 - **Usage Analytics**: Privacy-focused analytics
 - **Uptime Monitoring**: Status page
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a pull request
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -320,17 +387,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Setlist.fm](https://www.setlist.fm) for concert data
 - [Spotify Web API](https://developer.spotify.com/documentation/web-api/) for music platform integration
 - [Render.com](https://render.com) for hosting
-
-## 🔮 Future Enhancements
-
-1. **User Accounts**: Save playlist history
-2. **Batch Processing**: Create multiple playlists at once
-3. **Smart Matching**: ML-based track matching
-4. **Social Features**: Share playlists with friends
-5. **Analytics Dashboard**: Track playlist statistics
-6. **Mobile App**: Native iOS/Android apps
-7. **Offline Support**: PWA capabilities
-8. **Multi-language**: i18n support
 
 ---
 
